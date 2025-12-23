@@ -1,0 +1,48 @@
+# タスク: AWS Mainframe Modernization CardDemo の日本語化と分析
+
+- [x] リポジトリ構造と主要ファイルの調査 <!-- id: 0 -->
+- [x] 既存のドキュメント (README.md 等) の内容確認 <!-- id: 1 -->
+- [x] アーティファクト (ドキュメント/計画書) の日本語による作成・更新 <!-- id: 2 -->
+  - [x] 実装計画書 (implementation_plan.md) の作成 (日本語) <!-- id: 3 -->
+    - [x] [NEW] README_JP.md の作成 <!-- id: 4 -->
+    - [x] [NEW] CONTRIBUTING_JP.md の作成 <!-- id: 5 -->
+    - [x] [NEW] CODE_OF_CONDUCT_JP.md の作成 <!-- id: 6 -->
+    - [x] [NEW] サブディレクトリの README_JP.md の作成 <!-- id: 7 -->
+- [x] Git リモートリポジトリからの切断 <!-- id: 8 -->
+- [x] GitHub リポジトリ作成とプッシュ (inoppii) <!-- id: 9 -->
+- [x] 日本語化アーティファクトのコミットとプッシュ <!-- id: 10 -->
+- [x] DB2 から PostgreSQL への移行可能性調査 <!-- id: 11 -->
+- [x] PostgreSQL への変換と検証 (brew install postgresql) <!-- id: 12 -->
+- [x] アーティファクトのファイル保存と Git 反映 <!-- id: 13 -->
+- [x] COBOL詳細設計書の作成 <!-- id: 14 -->
+  - [x] フェーズ 1: トランザクションタイプ管理 (DB2関連) <!-- id: 15 -->
+  - [x] フェーズ 2: 承認機能 (IMS/MQ関連) <!-- id: 16 -->
+    - [x] COPAUA0C, COPAUS0C, COPAUS1C, COPAUS2C (CICS オンライン)
+    - [x] CBPAUP0C, DBUNLDGS, PAUDBLOD, PAUDBUNL (バッチ/ユーティリティ)
+  - [x] フェーズ 3: コアオンライン機能 (VSAM関連) <!-- id: 17 -->
+    - [x] 共通機能: `COMEN01C` (Menu), `COSGN00C` (Signon)
+    - [x] アカウント管理: `COACTUPC` (Update), `COACTVWC` (View)
+    - [x] カード管理: `COCRDUPC`, `COCRDLIC`, `COCRDSLC`
+    - [x] ユーザー管理: `COUSR00C`, `COUSR01C`, `COUSR02C`, `COUSR03C`
+    - [x] 取引管理: `COTRN00C` (List), `COTRN01C` (View), `COTRN02C` (Add)
+    - [x] その他: `COBIL00C` (Bill), `CORPT00C` (Report)
+    - [x] 作成した詳細設計書の Git commit & push
+  - [x] フェーズ 4: バッチ処理 <!-- id: 18 -->
+    - [x] 取引反映処理の分析: `CBTRN02C`, `CBTRN01C`
+    - [x] 利息計算処理 of 分析: `CBACT04C`
+    - [x] レポート・ステートメント出力の分析: `CBTRN03C`, `CBSTM03A`
+    - [x] マスタ抽出処理の分析: `CBACT01C`, `CBACT02C`, `CBACT03C`, `CBCUS01C`
+    - [x] 追加バッチプログラムの分析: `CBEXPORT`, `CBIMPORT`, `CSUTLDTC`, `COBSWAIT`
+    - [x] バッチ処理詳細設計書の Git commit & push
+- [x] 基本設計書の作成 <!-- id: 19 -->
+  - [x] システムアーキテクチャ・全体機能の整理
+  - [x] データ構造・業務フローの可視化
+  - [x] 基本設計書 (`BasicDesign.md`) の Git commit & push
+- [x] 基本設計書の詳細化・体系化 (Phase 6) <!-- id: 20 -->
+  - [x] 基本設計書 概要編のリライト
+  - [x] 基本設計書 オンライン処理編の作成
+  - [x] 基本設計書 バッチ処理編の作成
+  - [x] 基本設計書 データベース設計編の作成
+  - [x] 基本設計書 関連システムインターフェース編の作成
+  - [x] 基本設計書 運用管理編の作成
+  - [x] 全文書の Git commit & push
