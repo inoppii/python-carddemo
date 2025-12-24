@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - CardDemo{% endblock %}
+
+{% block content %}
+<div class="login-container glass-panel" style="max-width: 400px; width: 100%; padding: 3rem;">
+    <div class="text-center mb-4">
+        <h1 class="text-gradient" style="font-size: 2.5rem; margin-bottom: 0.5rem;">CardDemo</h1>
+        <p style="color: var(--text-muted);">Cloud Run Modernization</p>
+    </div>
+
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="username" class="form-label">User ID</label>
+            <input type="text" id="username" class="form-control" placeholder="USER0001" required value="USER0001">
+        </div>
+
+        <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" class="form-control" placeholder="••••••••" required value="PASSWORD">
+        </div>
+
+        <div id="error-message" style="color: #ef4444; margin-bottom: 1rem; display: none; text-align: center;"></div>
+
+        <button type="submit" class="btn btn-primary btn-block">
+            <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i> Sign In
+        </button>
+    </form>
+
+    <div class="text-center" style="margin-top: 2rem; font-size: 0.8rem; color: var(--text-muted); opacity: 0.6;">
+        <p>Debug Mode: <a href="/docs" style="color: var(--text-muted); text-decoration: underline;">API Docs</a></p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Specific script for login page if needed, but we'll put main logic in app.js
+    console.log("Login page loaded");
+</script>
+{% endblock %}

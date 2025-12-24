@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - CardDemo{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="width: 100%;">
+    <!-- Header -->
+    <header class="glass-panel"
+        style="padding: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+        <div class="logo">
+            <h2 class="text-gradient">CardDemo</h2>
+        </div>
+        <div class="user-info" style="display: flex; align-items: center; gap: 1rem;">
+            <span id="user-display" style="color: var(--text-color);">Welcome, User</span>
+            <button id="logout-btn" class="btn" style="background: rgba(255, 255, 255, 0.1); font-size: 0.9rem;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="glass-panel" style="padding: 2rem;">
+        <h3 style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">Main
+            Menu</h3>
+
+        <div id="menu-grid"
+            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+            <!-- Menu items will be injected here by JS -->
+            <div class="loading-spinner" style="col-span: full; text-align: center; color: var(--text-muted);">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                <p>Loading menu...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Dashboard specific logic to run when this page loads
+    document.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            window.location.href = '/';
+            return;
+        }
+
+        // Fetch User Info (simulated from token or separate endpoint if available)
+        // For now, let's assuming token payload has info or we just show generic
+        // In a real app, we might decode JWT here.
+
+        // Fetch Menu
+        try {
+            const response = await fetch('/menu/main', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const menuItems = await response.json();
+                renderMenu(menuItems);
+            } else {
+                console.error('Failed to fetch menu');
+                // Handle unauthorized
+                if (response.status === 401) {
+                    window.location.href = '/';
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching menu:', error);
+        }
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('access_token');
+            document.cookie = 'access_token=; Max-Age=0; path=/;';
+            window.location.href = '/';
+        });
+    });
+
+    function renderMenu(items) {
+        const grid = document.getElementById('menu-grid');
+        grid.innerHTML = ''; // Clear loading
+
+        items.forEach(item => {
+            // Skip "Logon/Off" since we have a logout button
+            if (item.label.includes("Logon/Off")) return;
+
+            const card = document.createElement('div');
+            card.className = 'menu-card glass-panel';
+            card.style.padding = '1.5rem';
+            card.style.cursor = 'pointer';
+            card.style.transition = '0.3s';
+            card.style.background = 'rgba(255, 255, 255, 0.03)';
+
+            // Icon mapping based on ID or Label
+            let icon = 'fa-circle';
+            if (item.label.includes("Account")) icon = 'fa-wallet';
+            if (item.label.includes("Card")) icon = 'fa-credit-card';
+            if (item.label.includes("Transaction")) icon = 'fa-exchange-alt';
+            if (item.label.includes("User")) icon = 'fa-users';
+            if (item.label.includes("Report")) icon = 'fa-chart-bar';
+            if (item.label.includes("System")) icon = 'fa-server';
+
+            card.innerHTML = `
+                <div style="font-size: 2rem; color: var(--accent-color); margin-bottom: 1rem;">
+                    <i class="fas ${icon}"></i>
+                </div>
+                <h4 style="margin-bottom: 0.5rem;">${item.label}</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Access ${item.label} features</p>
+            `;
+
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-5px)';
+                card.style.background = 'rgba(255, 255, 255, 0.08)';
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.background = 'rgba(255, 255, 255, 0.03)';
+            });
+
+            // For now, just log click as routes might not be ready
+            card.addEventListener('click', () => {
+                // In future, redirect to item.path if it exists and is a UI route
+                // For now, show alert or console
+                console.log(`Navigating to ${item.path}`);
+                // window.location.href = item.path; // Uncomment when routes exist
+                alert(`Demo: Selected ${item.label}`);
+            });
+
+            grid.appendChild(card);
+        });
+    }
+</script>
+{% endblock %}

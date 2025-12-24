@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - CardDemo{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="width: 100%;">
+    <!-- Header -->
+    <header class="glass-panel"
+        style="padding: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--secondary-color);">
+        <div class="logo">
+            <h2 class="text-gradient">CardDemo <span
+                    style="font-size: 0.8rem; background: var(--secondary-color); color: white; padding: 2px 8px; border-radius: 4px; vertical-align: middle;">ADMIN</span>
+            </h2>
+        </div>
+        <div class="user-info" style="display: flex; align-items: center; gap: 1rem;">
+            <span id="user-display" style="color: var(--text-color);">Admin User</span>
+            <button id="logout-btn" class="btn" style="background: rgba(255, 255, 255, 0.1); font-size: 0.9rem;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="glass-panel" style="padding: 2rem;">
+        <h3 style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">
+            Administration</h3>
+
+        <div id="menu-grid"
+            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+            <!-- Menu items will be injected here by JS -->
+            <div class="loading-spinner" style="col-span: full; text-align: center; color: var(--text-muted);">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                <p>Loading admin menu...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            window.location.href = '/';
+            return;
+        }
+
+        // Fetch Admin Menu
+        try {
+            const response = await fetch('/menu/admin', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const menuItems = await response.json();
+                renderMenu(menuItems);
+            } else {
+                console.error('Failed to fetch admin menu');
+                if (response.status === 401) {
+                    window.location.href = '/';
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching menu:', error);
+        }
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('access_token');
+            document.cookie = 'access_token=; Max-Age=0; path=/;';
+            window.location.href = '/';
+        });
+    });
+
+    function renderMenu(items) {
+        const grid = document.getElementById('menu-grid');
+        grid.innerHTML = '';
+
+        items.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'menu-card glass-panel';
+            card.style.padding = '1.5rem';
+            card.style.cursor = 'pointer';
+            card.style.transition = '0.3s';
+            card.style.background = 'rgba(255, 255, 255, 0.03)';
+
+            let icon = 'fa-cogs';
+            if (item.label.includes("User")) icon = 'fa-users-cog';
+            if (item.label.includes("Report")) icon = 'fa-file-alt';
+            if (item.label.includes("System")) icon = 'fa-network-wired';
+
+            card.innerHTML = `
+                <div style="font-size: 2rem; color: var(--secondary-color); margin-bottom: 1rem;">
+                    <i class="fas ${icon}"></i>
+                </div>
+                <h4 style="margin-bottom: 0.5rem;">${item.label}</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Administer ${item.label}</p>
+            `;
+
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-5px)';
+                card.style.background = 'rgba(255, 255, 255, 0.08)';
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.background = 'rgba(255, 255, 255, 0.03)';
+            });
+
+            card.addEventListener('click', () => {
+                console.log(`Navigating to ${item.path}`);
+                alert(`Admin: Selected ${item.label}`);
+            });
+
+            grid.appendChild(card);
+        });
+    }
+</script>
+{% endblock %}
