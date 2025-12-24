@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from ..models.models import User
 from ..utils.db import get_db
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 
 router = APIRouter(prefix="/users", tags=["users"])
