@@ -26,7 +26,7 @@
         <div id="menu-grid"
             style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
             <!-- Menu items will be injected here by JS -->
-            <div class="loading-spinner" style="col-span: full; text-align: center; color: var(--text-muted);">
+            <div class="loading-spinner" style="grid-column: 1 / -1; text-align: center; color: var(--text-muted);">
                 <i class="fas fa-spinner fa-spin fa-2x"></i>
                 <p>Loading menu...</p>
             </div>
@@ -123,11 +123,8 @@
 
             // For now, just log click as routes might not be ready
             card.addEventListener('click', () => {
-                // In future, redirect to item.path if it exists and is a UI route
-                // For now, show alert or console
                 console.log(`Navigating to ${item.path}`);
-                // window.location.href = item.path; // Uncomment when routes exist
-                alert(`Demo: Selected ${item.label}`);
+                window.location.href = item.path;
             });
 
             grid.appendChild(card);

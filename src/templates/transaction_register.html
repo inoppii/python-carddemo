@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Transaction Register - CardDemo{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="width: 100%;">
+    <!-- Header -->
+    <header class="glass-panel"
+        style="padding: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <a href="/dashboard" class="btn" style="background: rgba(255, 255, 255, 0.1); padding: 0.5rem 1rem;">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <h2 class="text-gradient">Transaction Register</h2>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <div class="glass-panel" style="padding: 3rem; max-width: 600px; margin: 0 auto;">
+
+        <form id="trn-form">
+            <div class="form-group">
+                <label for="card_num" class="form-label">Card Number</label>
+                <input type="text" id="card_num" class="form-control" placeholder="1234567890123456" required
+                    maxlength="16">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="trn_type_cd" class="form-label">Type</label>
+                    <select id="trn_type_cd" class="form-control"
+                        style="background: rgba(255, 255, 255, 0.05); color: #fff;">
+                        <option value="01">Purchase</option>
+                        <option value="02">withdrawal</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="trn_cat_cd" class="form-label">Category</label>
+                    <select id="trn_cat_cd" class="form-control"
+                        style="background: rgba(255, 255, 255, 0.05); color: #fff;">
+                        <option value="1">Food</option>
+                        <option value="2">Entertainment</option>
+                        <option value="3">Utilities</option>
+                        <option value="4">Medical</option>
+                        <option value="5">Transportation</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="trn_amount" class="form-label">Amount ($)</label>
+                <input type="number" id="trn_amount" class="form-control" placeholder="0.00" step="0.01" required>
+            </div>
+
+            <div class="form-group mb-4">
+                <label for="trn_desc" class="form-label">Description</label>
+                <input type="text" id="trn_desc" class="form-control" placeholder="e.g., Grocery Store" required>
+            </div>
+
+            <div id="status-message"
+                style="margin-bottom: 1rem; display: none; text-align: center; padding: 10px; border-radius: 8px;">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+                <i class="fas fa-paper-plane"></i> Submit Transaction
+            </button>
+        </form>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('trn-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const token = localStorage.getItem('access_token');
+        const statusMsg = document.getElementById('status-message');
+        statusMsg.style.display = 'none';
+
+        const data = {
+            card_num: document.getElementById('card_num').value,
+            trn_type_cd: document.getElementById('trn_type_cd').value,
+            trn_cat_cd: parseInt(document.getElementById('trn_cat_cd').value),
+            trn_amount: parseFloat(document.getElementById('trn_amount').value),
+            trn_desc: document.getElementById('trn_desc').value
+        };
+
+        try {
+            const response = await fetch('/transactions/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                statusMsg.textContent = 'Transaction Registered Successfully!';
+                statusMsg.style.background = 'rgba(74, 222, 128, 0.2)';
+                statusMsg.style.color = '#4ade80';
+                statusMsg.style.display = 'block';
+                document.getElementById('trn-form').reset();
+            } else {
+                const err = await response.json();
+                statusMsg.textContent = err.detail || 'Registration Failed';
+                statusMsg.style.background = 'rgba(239, 68, 68, 0.2)';
+                statusMsg.style.color = '#ef4444';
+                statusMsg.style.display = 'block';
+            }
+        } catch (error) {
+            console.error(error);
+            statusMsg.textContent = 'Network Error';
+            statusMsg.style.background = 'rgba(239, 68, 68, 0.2)';
+            statusMsg.style.color = '#ef4444';
+            statusMsg.style.display = 'block';
+        }
+    });
+</script>
+{% endblock %}

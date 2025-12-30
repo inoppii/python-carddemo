@@ -60,6 +60,32 @@ def startup_event():
     finally:
         db.close()
 
+# UI Routes (Must be defined before API routers to avoid collision)
+@app.get("/")
+def read_root(request: Request):
+    return templates.TemplateResponse(request=request, name="login.html")
+
+@app.get("/dashboard")
+def view_dashboard(request: Request):
+    return templates.TemplateResponse(request=request, name="dashboard.html")
+
+@app.get("/admin")
+def view_admin(request: Request):
+    return templates.TemplateResponse(request=request, name="admin.html")
+
+@app.get("/cards/list")
+def view_card_list(request: Request):
+    return templates.TemplateResponse(request=request, name="card_list.html")
+
+@app.get("/accounts/view")
+def view_account(request: Request):
+    return templates.TemplateResponse(request=request, name="account_view.html")
+
+@app.get("/transactions/reg")
+def view_transaction_reg(request: Request):
+    return templates.TemplateResponse(request=request, name="transaction_register.html")
+
+# API Routers
 app.include_router(p_COSGN00C.router)
 app.include_router(p_COACTVWC.router)
 app.include_router(p_COPAUA0C.router)
@@ -78,15 +104,3 @@ app.include_router(p_CORPT00C.router)
 app.include_router(p_COTRTLIC.router)
 app.include_router(p_COPAUS1C.router)
 app.include_router(p_COBTUPDT.router)
-
-@app.get("/")
-def read_root(request: Request):
-    return templates.TemplateResponse(request=request, name="login.html")
-
-@app.get("/dashboard")
-def view_dashboard(request: Request):
-    return templates.TemplateResponse(request=request, name="dashboard.html")
-
-@app.get("/admin")
-def view_admin(request: Request):
-    return templates.TemplateResponse(request=request, name="admin.html")

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Card List - CardDemo{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="width: 100%;">
+    <!-- Header -->
+    <header class="glass-panel"
+        style="padding: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <a href="/dashboard" class="btn" style="background: rgba(255, 255, 255, 0.1); padding: 0.5rem 1rem;">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <h2 class="text-gradient">Credit Cards</h2>
+        </div>
+        <div class="user-info">
+            <span id="user-display" style="color: var(--text-muted); font-size: 0.9rem;">Processing...</span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="glass-panel" style="padding: 2rem;">
+
+        <div class="table-container" style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; color: var(--text-color);">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--glass-border); text-align: left;">
+                        <th style="padding: 1rem;">Card Number</th>
+                        <th style="padding: 1rem;">Customer Name</th>
+                        <th style="padding: 1rem;">Account ID</th>
+                        <th style="padding: 1rem;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="card-list-body">
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                            <i class="fas fa-spinner fa-spin"></i> Loading cards...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            window.location.href = '/';
+            return;
+        }
+
+        try {
+            const response = await fetch('/cards/', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const cards = await response.json();
+                renderCards(cards);
+                document.getElementById('user-display').textContent = `Loaded ${cards.length} cards`;
+            } else {
+                document.getElementById('card-list-body').innerHTML = `
+                    <tr><td colspan="4" class="text-center" style="padding: 2rem; color: #ef4444;">Failed to load cards.</td></tr>
+                `;
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('card-list-body').innerHTML = `
+                <tr><td colspan="4" class="text-center" style="padding: 2rem; color: #ef4444;">Network Error</td></tr>
+            `;
+        }
+    });
+
+    function renderCards(cards) {
+        const tbody = document.getElementById('card-list-body');
+
+        if (cards.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center" style="padding: 2rem;">No cards found.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = cards.map(card => `
+            <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05); transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+                <td style="padding: 1rem; font-family: monospace; letter-spacing: 1px;">
+                    <i class="far fa-credit-card" style="margin-right: 8px; color: var(--accent-color);"></i>
+                    ${card.card_num}
+                </td>
+                <td style="padding: 1rem;">${card.first_name} ${card.last_name}</td>
+                <td style="padding: 1rem;">${card.acct_id}</td>
+                <td style="padding: 1rem;">
+                    <button class="btn" style="padding: 0.25rem 0.75rem; font-size: 0.8rem; background: var(--glass-bg); border: 1px solid var(--glass-border);">
+                        Details
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+</script>
+{% endblock %}

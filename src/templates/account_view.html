@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Account View - CardDemo{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="width: 100%;">
+    <!-- Header -->
+    <header class="glass-panel"
+        style="padding: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <a href="/dashboard" class="btn" style="background: rgba(255, 255, 255, 0.1); padding: 0.5rem 1rem;">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <h2 class="text-gradient">Account View</h2>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <div class="glass-panel" style="padding: 3rem; max-width: 600px; margin: 0 auto;">
+
+        <!-- Search Form -->
+        <div class="form-group mb-4">
+            <label for="acct_id" class="form-label">Account ID</label>
+            <div style="display: flex; gap: 1rem;">
+                <input type="number" id="acct_id" class="form-control" placeholder="Enter Account ID (e.g., 1)"
+                    required>
+                <button id="btn-search" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </div>
+
+        <div id="loading" class="text-center" style="display: none; padding: 2rem;">
+            <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-color);"></i>
+        </div>
+
+        <div id="error-message" style="color: #ef4444; margin-bottom: 1rem; display: none; text-align: center;"></div>
+
+        <!-- Details Card -->
+        <div id="account-details"
+            style="display: none; border-top: 1px solid var(--glass-border); padding-top: 2rem; margin-top: 2rem;">
+            <h3 style="margin-bottom: 1.5rem; color: var(--secondary-color);"><i class="fas fa-id-card"></i> Account
+                Details</h3>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div>
+                    <label class="form-label">Account ID</label>
+                    <div id="disp-acct-id" style="font-size: 1.2rem; font-weight: 500;"></div>
+                </div>
+                <div>
+                    <label class="form-label">Customer</label>
+                    <div id="disp-cust-name" style="font-size: 1.2rem; font-weight: 500;"></div>
+                </div>
+                <div>
+                    <label class="form-label">Balance</label>
+                    <div id="disp-balance" style="font-size: 1.5rem; color: var(--accent-color); font-weight: 700;">
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label">Status</label>
+                    <div id="disp-status"></div>
+                </div>
+                <div style="grid-column: span 2;">
+                    <label class="form-label">Opened Date</label>
+                    <div id="disp-date"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('btn-search').addEventListener('click', searchAccount);
+    document.getElementById('acct_id').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') searchAccount();
+    });
+
+    async function searchAccount() {
+        const acctId = document.getElementById('acct_id').value;
+        if (!acctId) return;
+
+        const token = localStorage.getItem('access_token');
+        const loading = document.getElementById('loading');
+        const errorMsg = document.getElementById('error-message');
+        const details = document.getElementById('account-details');
+
+        loading.style.display = 'block';
+        errorMsg.style.display = 'none';
+        details.style.display = 'none';
+
+        try {
+            const response = await fetch(`/accounts/${acctId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                document.getElementById('disp-acct-id').textContent = data.acct_id;
+                document.getElementById('disp-cust-name').textContent = `${data.first_name} ${data.last_name}`;
+                document.getElementById('disp-balance').textContent = `$${data.acct_balance.toFixed(2)}`;
+
+                const statusHtml = data.acct_status === 'A'
+                    ? '<span style="color: #4ade80; background: rgba(74, 222, 128, 0.2); padding: 4px 8px; border-radius: 4px;">Active</span>'
+                    : '<span style="color: #ef4444; background: rgba(239, 68, 68, 0.2); padding: 4px 8px; border-radius: 4px;">Inactive</span>';
+                document.getElementById('disp-status').innerHTML = statusHtml;
+
+                document.getElementById('disp-date').textContent = new Date(data.created_at).toLocaleDateString();
+
+                details.style.display = 'block';
+            } else {
+                errorMsg.textContent = 'Account not found.';
+                errorMsg.style.display = 'block';
+            }
+        } catch (error) {
+            console.error(error);
+            errorMsg.textContent = 'Server error occurred.';
+            errorMsg.style.display = 'block';
+        } finally {
+            loading.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}
